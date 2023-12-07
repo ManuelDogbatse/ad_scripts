@@ -40,8 +40,6 @@ foreach ($name in $nameList) {
                -Name $uName `
                -EmployeeID $uName `
                -PasswordNeverExpires $true `
-               # Add users to one of the departments
-               # 'ADSI' accesses the domain name of the domain for user creation
                -Path "OU=Users,OU=$($depList[$cnt]),$(([ADSI]'').distinguishedName)"
                -Enabled $true
     
