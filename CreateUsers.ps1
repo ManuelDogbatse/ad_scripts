@@ -1,6 +1,6 @@
 ﻿# Get template password for all users
 $passwordStr = Read-Host -Prompt "Enter the password for users"
-#$passwordStr   = "Password123!"    # Hard coded
+#$passwordStr = "Password123!"    # Hard coded
 # Read names and departments TXT files
 $nameList = Get-Content .\names.txt
 $depList = Get-Content .\departments.txt
@@ -8,7 +8,7 @@ $depList = Get-Content .\departments.txt
 # Convert password string to secure string for AD user creation
 $passwordSecStr = ConvertTo-SecureString $passwordStr -AsPlainText -Force
 
-Create an OU for each department, with 'Users' and 'Computers' sub-OUs
+# Create an OU for each department, with 'Users' and 'Computers' sub-OUs
 foreach  ($dep in $depList){
     New-ADOrganizationalUnit -Name $dep -ProtectedFromAccidentalDeletion $false
     New-ADOrganizationalUnit -Name "Users" -ProtectedFromAccidentalDeletion $false -Path "OU=$($dep),$(([ADSI]'').distinguishedName)"
@@ -34,11 +34,11 @@ foreach ($name in $nameList) {
     
     # Create new user
     New-AdUser -AccountPassword $passwordSecStr `
-               -GivenName $fname `
-               -Surname $lname `
-               -DisplayName "$fname $sname" `
-               -Name $username `
-               -EmployeeID $username `
+               -GivenName $fName `
+               -Surname $sName `
+               -DisplayName "$fName $sName" `
+               -Name $uName `
+               -EmployeeID $uName `
                -PasswordNeverExpires $true `
                # Add users to one of the departments
                # 'ADSI' accesses the domain name of the domain for user creation
