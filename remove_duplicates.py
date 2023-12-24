@@ -13,13 +13,27 @@ with open(names_file, "r", encoding="utf-8") as file:
     # Removes empty lines in txt file
     # Stores each name as a string in a list
     names_list = [line for line in names_str.split("\n") if line.strip()]
+    usernames_list = [name[0].lower() + name.split()[1].lower() for name in names_list]
 
-initials_set = set()
+# Merge names and usernames together
+name_uname_list = zip(usernames_list, names_list)
+# Convert into a dictionary to remove duplicate usernames
+names_dict = dict(name_uname_list)
 
-for name in names_list:
-    initials_set.add(name[0].lower() + name.split()[1].lower())
+print(names_dict)
+print(len(names_dict))
 
-print(f"Name count: {len(names_list)}\nUsername count: {len(initials_set)}")
+
+# print("Names and usernames:")
+# for i in range(10):
+#     print(f"{name_uname_list[i]}, {name_uname_list[i][1]}")
+
+# initials_set = set()
+
+# for name in names_list:
+#     initials_set.add(name[0].lower() + name.split()[1].lower())
+
+# print(f"Name count: {len(names_list)}\nUsername count: {len(initials_set)}")
 
 # count = 0
 
