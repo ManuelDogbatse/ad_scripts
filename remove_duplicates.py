@@ -1,15 +1,26 @@
 """Removes duplicates from names.txt"""
 import os
 
-path = os.getcwd()+"\\names.txt"
-print(path)
+path = os.getcwd()
+names_file = path + "\\names.txt"
+names_new_file = path + "\\names_new.txt"
 
-with open(path, "r", encoding="utf-8") as file:
+with open(names_file, "r", encoding="utf-8") as file:
+    print("Reading file\n")
     names_list = file.read().split("\n")
 
-print(names_list[0])
-print(len(names_list))
+for i, name in enumerate(names_list):
+    if name == "":
+        del names_list[i]
 
 names_set = sorted(set(names_list))
-print(names_set)
-print(len(names_set))
+print("Duplicates removed!")
+print(f"Original Name Count: {len(names_list)}")
+print(f"New Name Count: {len(names_set)}")
+
+with open(names_new_file, "w", encoding="utf-8") as file:
+    print("Writing to file\n")
+    names_str = "\n".join(names_set)
+    file.write(names_str)
+
+print("File write complete!")
