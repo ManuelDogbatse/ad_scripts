@@ -1,12 +1,10 @@
 import os
 
-print(os.getcwd())
+path = os.getcwd()+"\\names.txt"
+print(path)
 
-# path = "names.txt"
+with open(path, "r") as file:
+    names = file.read().split("\n")
 
-# with open(path, "r") as file:
-#     lines = file.read()
-#     lines_list = lines.split("\n")
-
-# print(lines_list[0])
-# print(len(lines_list))
+print(names[0])
+print(len(names))
