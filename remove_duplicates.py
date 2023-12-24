@@ -14,10 +14,12 @@ with open(names_file, "r", encoding="utf-8") as file:
     # Stores each name as a string in a list
     names_list = [line for line in names_str.split("\n") if line.strip()]
 
-# initials_set = {}
+initials_set = set()
 
-# f_list = names_list[0].split()
-# print(f_list)
+for name in names_list:
+    initials_set.add(name[0].lower() + name.split()[1].lower())
+
+print(f"Name count: {len(names_list)}\nUsername count: {len(initials_set)}")
 
 # count = 0
 
@@ -28,14 +30,14 @@ with open(names_file, "r", encoding="utf-8") as file:
 
 # print(f"Count: {count}")
 
-names_set = sorted(set(names_list))
-print("Duplicates removed!")
-print(f"Original Name Count: {len(names_list)}")
-print(f"New Name Count: {len(names_set)}")
+# names_set = sorted(set(names_list))
+# print("Duplicates removed!")
+# print(f"Original Name Count: {len(names_list)}")
+# print(f"New Name Count: {len(names_set)}")
 
-with open(names_new_file, "w", encoding="utf-8") as file:
-    print("Writing to file\n")
-    names_str = "\n".join(names_set)
-    file.write(names_str)
+# with open(names_new_file, "w", encoding="utf-8") as file:
+#     print("Writing to file\n")
+#     names_str = "\n".join(names_set)
+#     file.write(names_str)
 
-print("File write complete!")
+# print("File write complete!")
