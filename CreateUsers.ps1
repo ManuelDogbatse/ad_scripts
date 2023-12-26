@@ -2,7 +2,7 @@
 $passwordStr = Read-Host -Prompt "Enter the password for users"
 #$passwordStr = "Password123!"    # Hard coded
 # Read names and departments TXT files
-$nameList = Get-Content .\names.txt
+$nameList = Get-Content .\names_new.txt
 $depList = Get-Content .\departments.txt
 
 # Convert password string to secure string for AD user creation
