@@ -10,10 +10,18 @@ $depList = Get-Content .\departments.txt
 $passwordSecStr = ConvertTo-SecureString $passwordStr -AsPlainText -Force
 
 # Create an OU for each department, with 'Users' and 'Computers' sub-OUs
-foreach  ($dep in $depList){
-    New-ADOrganizationalUnit -Name $dep -ProtectedFromAccidentalDeletion $false
-    New-ADOrganizationalUnit -Name "Users" -ProtectedFromAccidentalDeletion $false -Path "OU=$($dep),$(([ADSI]'').distinguishedName)"
-    New-ADOrganizationalUnit -Name "Computers" -ProtectedFromAccidentalDeletion $false -Path "OU=$($dep),$(([ADSI]'').distinguishedName)"
+foreach ($dep in $depList) {
+    try {
+        if (Get-ADOrganizationalUnit -Identity "OU=$($dep),$(([ADSI]'').distinguishedName)") {
+            Write-Host "$dep does exist."
+        }
+    }
+    catch {
+        Write-Host "$dep does not exist. Creating OU"
+        New-ADOrganizationalUnit -Name "_$dep" -ProtectedFromAccidentalDeletion $false
+        New-ADOrganizationalUnit -Name "Users" -ProtectedFromAccidentalDeletion $false -Path "OU=_$($dep),$(([ADSI]'').distinguishedName)"
+        New-ADOrganizationalUnit -Name "Computers" -ProtectedFromAccidentalDeletion $false -Path "OU=_$($dep),$(([ADSI]'').distinguishedName)"
+    }
 }
 
 # 'textInfo' for converting names to title case
@@ -24,7 +32,7 @@ $n = $depList.Count
 # Create each user in names TXT file
 foreach ($name in $nameList) {
     # Split line into forename and surname, and change to title case
-    $fName, $sName = $name.Split(" ") | ForEach-Object {$textInfo.ToTitleCase($_)}
+    $fName, $sName = $name.Split(" ") | ForEach-Object { $textInfo.ToTitleCase($_) }
     $uName = "$($fName.Substring(0,1))$($sName)".ToLower()
     # Print current user and current department
     Write-Host "Creating user " -ForegroundColor Cyan -NoNewline
@@ -35,19 +43,18 @@ foreach ($name in $nameList) {
     
     # Create new user
     New-AdUser -AccountPassword $passwordSecStr `
-               -GivenName $fName `
-               -Surname $sName `
-               -DisplayName "$fName $sName" `
-               -Name $uName `
-               -EmployeeID $uName `
-               -PasswordNeverExpires $true `
-               -Path "OU=Users,OU=$($depList[$cnt]),$(([ADSI]'').distinguishedName)" `
-               -Enabled $true
+        -GivenName $fName `
+        -Surname $sName `
+        -DisplayName "$fName $sName" `
+        -Name $uName `
+        -EmployeeID $uName `
+        -PasswordNeverExpires $true `
+        -Path "OU=Users,OU=_$($depList[$cnt]),$(([ADSI]'').distinguishedName)" `
+        -Enabled $true
     
     # Change departments
     $cnt++
-    if ($cnt -eq $n)
-    {
+    if ($cnt -eq $n) {
         $cnt = 0
     }
 }
