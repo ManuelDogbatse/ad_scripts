@@ -25,7 +25,9 @@ print("Sorting dictionary in alphabetic order")
 names_dict = dict(sorted(names_dict.items()))
 
 print("Duplicates removed successfully")
-print(f"Original names list count: {len(names_list)}\nNew names list count: {len(names_dict)}")
+print(
+    f"Original names list count: {len(names_list)}\nNew names list count: {len(names_dict)}"
+)
 
 # Write new list of names to text file
 with open(names_formatted_file, "w", encoding="utf-8") as file:
