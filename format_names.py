@@ -4,7 +4,7 @@ import os
 # Get absolute file path for text file
 path = os.getcwd()
 names_file = path + "\\names.txt"
-names_new_file = path + "\\names_new.txt"
+names_formatted_file = path + "\\names_formatted.txt"
 
 # Reads text file and saves lines to list
 with open(names_file, "r", encoding="utf-8") as file:
@@ -28,7 +28,7 @@ print("Duplicates removed successfully")
 print(f"Original names list count: {len(names_list)}\nNew names list count: {len(names_dict)}")
 
 # Write new list of names to text file
-with open(names_new_file, "w", encoding="utf-8") as file:
+with open(names_formatted_file, "w", encoding="utf-8") as file:
     print("Writing to file")
     names_str = "\n".join(names_dict.values())
     file.write(names_str)
