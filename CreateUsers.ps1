@@ -41,7 +41,7 @@ foreach ($name in $nameList) {
                -Name $uName `
                -EmployeeID $uName `
                -PasswordNeverExpires $true `
-               -Path "OU=Users,OU=$($depList[$cnt]),$(([ADSI]'').distinguishedName)"
+               -Path "OU=Users,OU=$($depList[$cnt]),$(([ADSI]'').distinguishedName)" `
                -Enabled $true
     
     # Change departments
