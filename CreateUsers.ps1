@@ -1,7 +1,7 @@
 ﻿# Get template password for all users
-#$passwordStr = Read-Host -Prompt "Enter the password for users"
+$passwordStr = Read-Host -Prompt "Enter the password for users"
 # Comment the line above and uncomment the line below to hard code the password instead
-$passwordStr = "Password123"    # Hard coded
+#$passwordStr = "Password123"    # Hard coded
 # Read names and departments TXT files
 $nameList = Get-Content .\names_formatted.txt
 $depList = Get-Content .\departments.txt
