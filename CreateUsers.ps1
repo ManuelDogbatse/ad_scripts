@@ -20,11 +20,13 @@ foreach ($dep in $depList) {
     # Create OUs and nested OUs (Users and Computers) for department if it doesn't exist
     try {
         if (Get-ADOrganizationalUnit -Identity "OU=_$($depNames[-1]),$(([ADSI]'').distinguishedName)") {
-            Write-Host "$($depNames[-1]) does exist"
+            Write-Host "$($depNames[-1]) " -ForegroundColor Red -NoNewline
+            Write-Host "does exist" -ForegroundColor Cyan
         }
     }
     catch {
-        Write-Host "$($depNames[-1]) does not exist. Creating OU"
+        Write-Host "$($depNames[-1]) " -ForegroundColor Red -NoNewline
+        Write-Host "does not exist. Creating OU" -ForegroundColor Cyan
         New-ADOrganizationalUnit -Name "_$($depNames[-1])" -ProtectedFromAccidentalDeletion $false
         New-ADOrganizationalUnit -Name "Users" -ProtectedFromAccidentalDeletion $false -Path "OU=_$($depNames[-1]),$(([ADSI]'').distinguishedName)"
         New-ADOrganizationalUnit -Name "Computers" -ProtectedFromAccidentalDeletion $false -Path "OU=_$($depNames[-1]),$(([ADSI]'').distinguishedName)"
@@ -33,34 +35,47 @@ foreach ($dep in $depList) {
     # Create user group for each department
     try {
         if (Get-ADGroup -Identity "$($depNames[-1]) Users") {
-            Write-Host "User group for $($depNames[-1]) does exist"
+            Write-Host "User group for " -ForegroundColor Cyan -NoNewline
+            Write-Host "$($depNames[-1]) " -ForegroundColor Red -NoNewline
+            Write-Host "does exist" -ForegroundColor Cyan
         }
     }
     catch {
-        Write-Host "User group for $($depNames[-1]) does not exist. Creating user group"
-        New-ADGroup -Name "$($depNames[-1]) Users" -GroupCategory Security -GroupScope Global -Path "OU=Users,OU=_$($depNames[-1]),$(([ADSI]'').distinguishedName)" -SamAccountName "$($depNames[-1]) Users"
+        Write-Host "User group for " -ForegroundColor Cyan -NoNewline
+        Write-Host "$($depNames[-1]) " -ForegroundColor Red -NoNewline
+        Write-Host "does not exist. Creating user group" -ForegroundColor Cyan
+        New-ADGroup -Name "$($depNames[-1]) Users" -GroupCategory Security -GroupScope Global -Path "OU=Users,OU=_$($depNames[-1]),$(([ADSI]'').distinguishedName)" -SAMAccountName "$($depNames[-1]) Users"
     }
     
     # Create computer group for each department
     try {
         if (Get-ADGroup -Identity "$($depNames[-1]) Computers") {
-            Write-Host "Computer group for $($depNames[-1]) does exist"
+            Write-Host "Computer group for " -ForegroundColor Cyan -NoNewline
+            Write-Host "$($depNames[-1]) " -ForegroundColor Red -NoNewline
+            Write-Host "does exist"-ForegroundColor Cyan
         }
     }
     catch {
-        Write-Host "Computer group for $($depNames[-1]) does not exist. Creating computer group"
-        New-ADGroup -Name "$($depNames[-1]) Computers" -GroupCategory Security -GroupScope Global -Path "OU=Computers,OU=_$($depNames[-1]),$(([ADSI]'').distinguishedName)" -SamAccountName "$($depNames[-1]) Computers"
+        Write-Host "Computer group for " -ForegroundColor Cyan -NoNewline
+        Write-Host "$($depNames[-1]) " -ForegroundColor Red -NoNewline
+        Write-Host "does not exist. Creating computer group" -ForegroundColor Cyan
+        New-ADGroup -Name "$($depNames[-1]) Computers" -GroupCategory Security -GroupScope Global -Path "OU=Computers,OU=_$($depNames[-1]),$(([ADSI]'').distinguishedName)" -SAMAccountName "$($depNames[-1]) Computers"
     }
     
     # Create computer for each department
     try {
         if (Get-ADComputer -Identity "$($depInitials[-1])-CLIENT1") {
-            Write-Host "Computer for $($depNames[-1]) does exist"
+            Write-Host "Computer for " -ForegroundColor Cyan -NoNewline
+            Write-Host "$($depNames[-1]) " -ForegroundColor Red -NoNewline
+            Write-Host "does exist" -ForegroundColor Cyan
         }
     }
     catch {
-        Write-Host "Computer for $($depNames[-1]) does not exist. Creating computer"
-        New-ADComputer -Name "$($depInitials[-1])-CLIENT1" -Path "OU=Computers,OU=_$($depNames[-1]),$(([ADSI]'').distinguishedName)"
+        Write-Host "Computer for " -ForegroundColor Cyan -NoNewline
+        Write-Host "$($depNames[-1]) " -ForegroundColor Red -NoNewline
+        Write-Host "does not exist. Creating computer" -ForegroundColor Cyan
+        New-ADComputer -Name "$($depInitials[-1])-CLIENT1" -SAMAccountName "$($depInitials[-1])-CLIENT1" -Path "OU=Computers,OU=_$($depNames[-1]),$(([ADSI]'').distinguishedName)"
+        Add-ADGroupMember -Identity "$($depNames[-1]) Computers" -Members "$($depInitials[-1])-CLIENT1$"
     }
 }
 
