@@ -1,46 +1,66 @@
 ﻿# Get template password for all users
-$passwordStr = Read-Host -Prompt "Enter the password for users"
+#$passwordStr = Read-Host -Prompt "Enter the password for users"
 # Comment the line above and uncomment the line below to hard code the password instead
-#$passwordStr = "Password123"    # Hard coded
+$passwordStr = "Password123"    # Hard coded
 # Read names and departments TXT files
 $nameList = Get-Content .\names_formatted.txt
 $depList = Get-Content .\departments.txt
+$depNames = @()
+$depInitials = @()
 
 # Convert password string to secure string for AD user creation
 $passwordSecStr = ConvertTo-SecureString $passwordStr -AsPlainText -Force
 
-# Create an OU for each department, with 'Users' and 'Computers' sub-OUs, and create 'Users' and 'Computers' groups for each department
+# Loop through each department
 foreach ($dep in $depList) {
-    try {
-        if (Get-ADOrganizationalUnit -Identity "OU=$($dep),$(([ADSI]'').distinguishedName)") {
-            Write-Host "$dep does exist."
-        }
-    }
-    catch {
-        Write-Host "$dep does not exist. Creating OU"
-        New-ADOrganizationalUnit -Name "_$dep" -ProtectedFromAccidentalDeletion $false
-        New-ADOrganizationalUnit -Name "Users" -ProtectedFromAccidentalDeletion $false -Path "OU=_$($dep),$(([ADSI]'').distinguishedName)"
-        New-ADOrganizationalUnit -Name "Computers" -ProtectedFromAccidentalDeletion $false -Path "OU=_$($dep),$(([ADSI]'').distinguishedName)"
-    }
+    $splitStr = $dep.Split(",")
+    $depNames += $splitStr[0]
+    $depInitials += $splitStr[1]
 
+    # Create OUs and nested OUs (Users and Computers) for department if it doesn't exist
     try {
-        if (Get-ADGroup -Identity "$dep Users") {
-            Write-Host "User group for $dep does exist"
+        if (Get-ADOrganizationalUnit -Identity "OU=_$($depNames[-1]),$(([ADSI]'').distinguishedName)") {
+            Write-Host "$($depNames[-1]) does exist"
         }
     }
     catch {
-        Write-Host "User group for $dep does not exist. Creating user group"
-        New-ADGroup -Name "$dep Users" -GroupCategory Security -GroupScope Global -Path "OU=Users,OU=_$($dep),$(([ADSI]'').distinguishedName)" -SamAccountName "$dep Users"
+        Write-Host "$($depNames[-1]) does not exist. Creating OU"
+        New-ADOrganizationalUnit -Name "_$($depNames[-1])" -ProtectedFromAccidentalDeletion $false
+        New-ADOrganizationalUnit -Name "Users" -ProtectedFromAccidentalDeletion $false -Path "OU=_$($depNames[-1]),$(([ADSI]'').distinguishedName)"
+        New-ADOrganizationalUnit -Name "Computers" -ProtectedFromAccidentalDeletion $false -Path "OU=_$($depNames[-1]),$(([ADSI]'').distinguishedName)"
     }
-
+    
+    # Create user group for each department
     try {
-        if (Get-ADGroup -Identity "$dep Computers") {
-            Write-Host "Computer group for $dep does exist"
+        if (Get-ADGroup -Identity "$($depNames[-1]) Users") {
+            Write-Host "User group for $($depNames[-1]) does exist"
         }
     }
     catch {
-        Write-Host "Computer group for $dep does not exist. Creating computer group"
-        New-ADGroup -Name "$dep Computers" -GroupCategory Security -GroupScope Global -Path "OU=Computers,OU=_$($dep),$(([ADSI]'').distinguishedName)" -SamAccountName "$dep Computers"
+        Write-Host "User group for $($depNames[-1]) does not exist. Creating user group"
+        New-ADGroup -Name "$($depNames[-1]) Users" -GroupCategory Security -GroupScope Global -Path "OU=Users,OU=_$($depNames[-1]),$(([ADSI]'').distinguishedName)" -SamAccountName "$($depNames[-1]) Users"
+    }
+    
+    # Create computer group for each department
+    try {
+        if (Get-ADGroup -Identity "$($depNames[-1]) Computers") {
+            Write-Host "Computer group for $($depNames[-1]) does exist"
+        }
+    }
+    catch {
+        Write-Host "Computer group for $($depNames[-1]) does not exist. Creating computer group"
+        New-ADGroup -Name "$($depNames[-1]) Computers" -GroupCategory Security -GroupScope Global -Path "OU=Computers,OU=_$($depNames[-1]),$(([ADSI]'').distinguishedName)" -SamAccountName "$($depNames[-1]) Computers"
+    }
+    
+    # Create computer for each department
+    try {
+        if (Get-ADComputer -Identity "$($depInitials[-1])-CLIENT1") {
+            Write-Host "Computer for $($depNames[-1]) does exist"
+        }
+    }
+    catch {
+        Write-Host "Computer for $($depNames[-1]) does not exist. Creating computer"
+        New-ADComputer -Name "$($depInitials[-1])-CLIENT1" -Path "OU=Computers,OU=_$($depNames[-1]),$(([ADSI]'').distinguishedName)"
     }
 }
 
@@ -58,7 +78,7 @@ foreach ($name in $nameList) {
     Write-Host "Creating user " -ForegroundColor Cyan -NoNewline
     Write-Host "$($fName) $($sName) ($($uName)) " -ForegroundColor Yellow -NoNewline
     Write-Host "in the " -ForegroundColor Cyan -NoNewline
-    Write-Host "$($depList[$cnt]) " -ForegroundColor Red -NoNewline
+    Write-Host "$($depNames[$cnt]) " -ForegroundColor Red -NoNewline
     Write-Host "department" -ForegroundColor Cyan
     
     # Create new user
@@ -69,11 +89,11 @@ foreach ($name in $nameList) {
         -Name $uName `
         -EmployeeID $uName `
         -PasswordNeverExpires $true `
-        -Path "OU=Users,OU=_$($depList[$cnt]),$(([ADSI]'').distinguishedName)" `
+        -Path "OU=Users,OU=_$($depNames[$cnt]),$(([ADSI]'').distinguishedName)" `
         -Enabled $true
     
     # Add user to department users group
-    Add-ADGroupMember -Identity "$($depList[$cnt]) Users" -Members $uName
+    Add-ADGroupMember -Identity "$($depNames[$cnt]) Users" -Members $uName
     
     # Change departments
     $cnt++
