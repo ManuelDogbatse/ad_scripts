@@ -1,4 +1,4 @@
-# Powershell Script for Creating OUs, Users and Groups
+# Python and Powershell scripts for Active Directory Lab
 
 This repo contains 2 scripts for my [Active Directory lab](https://github.com/ManuelDogbatse/active_directory):
 - format_names.py
