@@ -22,6 +22,16 @@ foreach ($dep in $depList) {
         New-ADOrganizationalUnit -Name "Users" -ProtectedFromAccidentalDeletion $false -Path "OU=_$($dep),$(([ADSI]'').distinguishedName)"
         New-ADOrganizationalUnit -Name "Computers" -ProtectedFromAccidentalDeletion $false -Path "OU=_$($dep),$(([ADSI]'').distinguishedName)"
     }
+
+    try {
+        if (Get-ADGroup -Identity "OU=Users,OU=_$($dep),$(([ADSI]'').distinguishedName)") {
+            Write-Host "Group for $dep does exist"
+        }
+    }
+    catch {
+        Write-Host "Group for $dep does not exist. Creating group"
+        New-ADGroup -Name "$dep Users" -GroupCategory Security -GroupScope Global -Path "OU=Users,OU=_$($dep),$(([ADSI]'').distinguishedName)" -SamAccountName "$dep Users"
+    }
 }
 
 # 'textInfo' for converting names to title case
